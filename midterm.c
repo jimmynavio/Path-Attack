@@ -12,27 +12,36 @@ square** gameboard;
 int randomNum(int);
 void initBoard();
 void printBoard();
-void turn(char);
+void humanTurn(char);
+void compTurn(char);
 void resetChecked();
 char checkBoard();
 void checkSquare(int, int);
 
 int main(int argc, char *argv[]){
   srand(time(NULL));
-  if(argc < 2){
-    printf( "usage: %s size\n", argv[0] );
+  if(argc < 3){
+    printf( "usage: %s size humans (0 - 2)\n", argv[0] );
     exit(1);
   }
   
   size = atoi(argv[1]);
+  int humans = atoi(argv[2]);
   initBoard();
   
   int i;
   for(i=0; i<size*size; i++){
-    if(i%2 == 0)
-      turn('V');
-    else
-      turn('H');
+    if(i%2 == 0){
+      if(humans > 0)
+        humanTurn('V');
+      else
+        compTurn('V');
+    }else{
+      if(humans > 1)
+        humanTurn('H');
+      else
+        compTurn('H');
+    }
         
     char winner = checkBoard();
     if(winner > -1){
@@ -82,7 +91,30 @@ void printBoard(){
   printf("\n");
 }
 
-void turn(char play){
+void humanTurn(char player){
+  int x, y;
+  
+  printBoard();
+  printf("\n%c's turn! Enter a location (x y): ", player);
+  scanf("%d %d",&y,&x);
+  
+  while(outOfBounds(x) || outOfBounds(y)){
+    printBoard();
+    printf("\nOut of bounds! Try another location (x y): ", player);
+    scanf("%d %d",&y,&x);
+  }
+  
+  while(gameboard[x][y].status != '0'){
+    printBoard();
+    printf("\nSpot taken! Try another location (x y): ", player);
+    scanf("%d %d",&y,&x);
+  }
+  
+  gameboard[x][y].status = player;
+  printBoard();
+}
+
+void compTurn(char player){
   int x = randomNum(size);
   int y = randomNum(size);
   
@@ -91,7 +123,7 @@ void turn(char play){
     y = randomNum(size);
   }
   
-  gameboard[x][y].status = play;
+  gameboard[x][y].status = player;
 }
 
 void resetChecked(){
@@ -123,7 +155,7 @@ char checkBoard(){
 }
 
 int checkV(int x, int y){
-  if (x >= size || y >= size || x < 0 || y < 0) return -1;
+  if (outOfBounds(x) || outOfBounds(y)) return -1;
   if (gameboard[x][y].status != 'V') return -1;
   if (gameboard[x][y].checked == 1) return -1;
   
@@ -145,7 +177,7 @@ int checkV(int x, int y){
 }
 
 int checkH(int x, int y){
-  if (x >= size || y >= size || x < 0 || y < 0) return -1;
+  if (outOfBounds(x) || outOfBounds(y)) return -1;
   if (gameboard[x][y].status != 'H') return -1;
   if (gameboard[x][y].checked == 1) return -1;
   
@@ -164,4 +196,8 @@ int checkH(int x, int y){
   
   gameboard[x][y].status = 'H';
   return -1;
+}
+
+int outOfBounds(int position){
+  return position >= size || position < 0;
 }

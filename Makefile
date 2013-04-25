@@ -1,9 +1,9 @@
 all: midterm
 
 midterm: midterm.o
-	gcc midterm.o -o midterm 
+	gcc -o midterm midterm.o 
 
-midterm.o:
+midterm.o: midterm.c
 	gcc -c midterm.c
 
 clean:
