@@ -1,43 +1,21 @@
-#########################################
-# Windows flags
-#########################################
-CFLAGS = -I../include -pthread -O1
-LIB    = ../lib/win32/libglfw.a
-LFLAGS = resources/midterm.res $(LIB) -glfw -opengl32 -lopengl32 -pthread -lm
+default:
+	@echo ""
+	@echo "This is the root makefile for team Awesome (aka team Java Package)'s midterm!"
+	@echo "Use one of the following commands:"
+	@echo "-----------------------------------------------------------------------------"
+	@echo "  $(MAKE) win32              to compile for Windows using MinGW"
+	@echo "  $(MAKE) win32-clean        to remove any files generated for this target"
+	@echo "-----------------------------------------------------------------------------"
+	@echo "  $(MAKE) x11                to compile for X11 on Unix-like systems"
+	@echo "  $(MAKE) x11-clean          to remove any files generated for this target"
+	@echo "-----------------------------------------------------------------------------"
 
-#########################################
-# Linux flags
-#########################################
-#
-#CFLAGS = -I../include -pthread -O1
-#LIB    = ../lib/x11/libglfw.a
-#LFLAGS = $(LIB) -lrt -lX11 -lGLU -lGL -pthread -lm
-########################3
-all: midterm
-
-midterm: midterm.o cfonts.o fonttex.o
-	gcc midterm.o cfonts.o fonttex.o $(LFLAGS) -o midterm
-
-midterm.o: midterm.c
-	gcc -c $(CFLAGS) midterm.c
-
-cfonts.o: cfonts.c
-	gcc $(CFLAGS) -c cfonts.c
-
-fonttex.o: fonttex.c
-	gcc $(CFLAGS) -c fonttex.c
-
-#####################################
-# Windows clean
-#####################################
-clean:
-	del midterm.exe
-	del midterm.o
-	del cfonts.o
-	del fonttex.o
-#####################################
-# Linux clean
-#####################################
-#clean:
-#	rm -f midterm
-#	rm -f *.o
+win32:
+	$(MAKE) -f Makefile.win32
+win32-clean:
+	$(MAKE) -f Makefile.win32 clean
+  
+x11:
+	$(MAKE) -f Makefile.x11
+x11-clean:
+	$(MAKE) -f Makefile.x11 clean
