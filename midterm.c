@@ -1,3 +1,25 @@
+// Authors: Paul Royer and Frank Madrid
+// Purporse: CMPS 335 - Software Engineering Midterm
+/*
+	Description
+ 		This program defines a skeleton layout for grid based games which accepts keyboard and mouse input 
+ 		and terminates once a pre determined condition is met. "Midterm" features two playable modes, "Player vs. Player" and "AI vs AI."
+
+	Features
+		- Two Playable Modes
+			- Use C to toggle between the two modes
+ 			- Player vs Player
+				- Players alternate placing their "token" on the grid.
+					- Player One: Lect Mouse - Click
+					- Player Two: Right Mouse - Click
+				- AI vs AI
+					- The computer will randomly allocate its "tokens" throughout the board
+		- Customizeable Grid
+			- Use Keys 0 - 9 to alter the size of the gameboard "on-the-fly"
+				- Warning: Altering the grid size will restart the game
+		- Start a new game with N
+		- Quit the program with Q
+*/
 #define USE_FONTS
 #define MAXSIZE 100
 
@@ -72,14 +94,17 @@ Square grid[MAXSIZE][MAXSIZE];
 GLuint Htexture;
 GLuint Vtexture;
 
-int main(int argc, char *argv[])
-{
+// Function - main
+// Main Program Processing. Receives the board size as an argument from the command line. If the
+// board size is not specified, defaults to 10.
+int main(int argc, char *argv[]) {
   if(argc < 2){
     gameSize = 10;
   }else{
     gameSize = atoi(argv[1]);
   }
   
+  // Catch invalid board size
   if(gameSize > MAXSIZE){
     printf("Game size must not exceed %d\n", MAXSIZE);
     exit(EXIT_FAILURE);
@@ -93,7 +118,7 @@ int main(int argc, char *argv[])
 	
   #ifdef USE_FONTS
 	initialize_fonts();
-	#endif
+  #endif
   
   srand(time(NULL));
 	while(1){
@@ -109,6 +134,7 @@ int main(int argc, char *argv[])
 	shut_down(0);
 }
 
+// Function - shut_down
 void shut_down(int return_code){
   glfwTerminate();
   
@@ -119,6 +145,7 @@ void shut_down(int return_code){
   exit(return_code);
 }
 
+// Function - init_glfw
 int init_glfw(void){
 	int nmodes;
 	GLFWvidmode glist[256];
@@ -152,6 +179,7 @@ int init_glfw(void){
 	return 0;
 }
 
+// Function - init_opengl
 void init_opengl(void){
 	//OpenGL initialization
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -171,6 +199,9 @@ void init_opengl(void){
 	printf("tex: %i %i\n",Htexture,Vtexture);
 }
 
+// Function - init_board
+// Called on a new game or when there is a change to the board size.
+// Defines the board paramaeters
 void init_board(void){
   board.winner = 0;
   board.movesLeft = gameSize*gameSize;
@@ -194,6 +225,9 @@ void init_board(void){
   init_squares();
 }
 
+// Function - init_squares
+// Called on a new game or when there is a change to the board size.
+// Defines the square paramaeters
 void init_squares(void){
   int i, j;
   for (i=0; i<gameSize; i++) {
@@ -220,6 +254,8 @@ void init_squares(void){
 	}
 }
 
+// Function - check_mouse
+// Determines the mouse position and if it is over any "clickable" area
 void check_mouse(void){	
 	if(board.winner != 0 || AImode == 1)
     return;
@@ -238,12 +274,6 @@ void check_mouse(void){
 		}
 	}
   
-  // OPTOMIZATION?!
-  // i = (x-board.left)/squareArea;
-  // j = (y-board.bottom)/squareArea;
-  // if (outOfBounds(i) || outOfBounds(j)) return;
-  // grid[i][j].over=1;
-  
 	for (i=0; i<gameSize; i++) {
 		for (j=0; j<gameSize; j++) {
      if (x >= grid[i][j].left &&
@@ -258,6 +288,7 @@ void check_mouse(void){
 	}
 }
 
+// Function - mouse_click
 void GLFWCALL mouse_click(int button, int action){  
   if(board.winner != 0 || AImode == 1)
     return;
@@ -286,6 +317,7 @@ void GLFWCALL mouse_click(int button, int action){
 	}
 }
 
+// Function - key_press
 void GLFWCALL key_press(int key, int action){
   if(action == GLFW_PRESS){
     switch(key){
@@ -353,6 +385,7 @@ void GLFWCALL key_press(int key, int action){
   }
 }
 
+// Function - render
 void render(void){
   int linePos;
   
@@ -446,6 +479,7 @@ void render(void){
   ggprint16(&rRight, 24, 0x00bbaa33, "Press 0-9 to change size");
 }
 
+// Function - loadBMP
 GLuint loadBMP(const char *imagepath){
 	//When you create your texture files, please specify
 	//type: BMP
@@ -505,6 +539,8 @@ GLuint loadBMP(const char *imagepath){
 	return textureID;
 }
 
+// Function - resetChecked
+// Helper function to checkBoard. Resets the "checked" status of each square.
 void resetChecked(void){
   int i, j;
   for(i=0; i<gameSize; i++){
@@ -514,6 +550,7 @@ void resetChecked(void){
   }  
 }
 
+// Function - checkBoard
 void checkBoard(void){
   int i;
   if(board.winner != 0)
@@ -531,6 +568,7 @@ void checkBoard(void){
   }
 }
 
+// Function - checkV
 int checkV(int i, int j){
   if (outOfBounds(i) || outOfBounds(j)) return -1;
   if (grid[i][j].status != 'V') return -1;
@@ -553,6 +591,7 @@ int checkV(int i, int j){
   return -1;
 }
 
+// Function - checkH
 int checkH(int i, int j){
   if (outOfBounds(i) || outOfBounds(j)) return -1;
   if (grid[i][j].status != 'H') return -1;
@@ -575,14 +614,17 @@ int checkH(int i, int j){
   return -1;
 }
 
+// Function - outOfBounds
 int outOfBounds(int position){
   return position >= gameSize || position < 0;
 }
 
+// Function - randomNum
 int randomNum(int max){
   return (rand() % (max));
 }
 
+// Function - compTurn
 void compTurn(char player){
   int i = randomNum(gameSize);
   int j = randomNum(gameSize);
@@ -597,6 +639,7 @@ void compTurn(char player){
   checkBoard();
 }
 
+// Function - humanTurn
 void humanTurn(int i, int j, char player){
   if(grid[i][j].status != 0){
     return;

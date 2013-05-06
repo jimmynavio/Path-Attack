@@ -1,17 +1,18 @@
 #########################################
 # Windows flags
 #########################################
-# CFLAGS = -I../include -pthread -O1
-# LIB    = ../lib/win32/libglfw.a
-# LFLAGS = midterm.res $(LIB) -glfw -opengl32 -lopengl32 -pthread -lm
+CFLAGS = -I../include -pthread -O1
+LIB    = ../lib/win32/libglfw.a
+LFLAGS = resources/midterm.res $(LIB) -glfw -opengl32 -lopengl32 -pthread -lm
 
 #########################################
 # Linux flags
 #########################################
-CFLAGS = -I../include -pthread -O1
-LIB    = ../lib/x11/libglfw.a
-LFLAGS = $(LIB) -lrt -lX11 -lGLU -lGL -pthread -lm
-
+#
+#CFLAGS = -I../include -pthread -O1
+#LIB    = ../lib/x11/libglfw.a
+#LFLAGS = $(LIB) -lrt -lX11 -lGLU -lGL -pthread -lm
+########################3
 all: midterm
 
 midterm: midterm.o cfonts.o fonttex.o
@@ -25,7 +26,18 @@ cfonts.o: cfonts.c
 
 fonttex.o: fonttex.c
 	gcc $(CFLAGS) -c fonttex.c
-  
+
+#####################################
+# Windows clean
+#####################################
 clean:
-	rm -f midterm
-	rm -f *.o
+	del midterm.exe
+	del midterm.o
+	del cfonts.o
+	del fonttex.o
+#####################################
+# Linux clean
+#####################################
+#clean:
+#	rm -f midterm
+#	rm -f *.o
